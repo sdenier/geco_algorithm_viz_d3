@@ -51,10 +51,23 @@
 
   <div class="algo">
     <div>
-      <h2>Sections</h2>
-      <svg id="sections" width="800px" height="50px" style="border: 1px solid gray"></svg>
+      <h3>Sections</h3>
+      <svg id="sections" width="800px" height="50px"></svg>
     </div>
-    <div class="description"></div>
+    <div>
+      <h3>Punches</h3>
+      <div>
+        <svg id="punches" width="800px" height="50px"></svg>
+        <svg id="punchesA" width="800px" height="50px"></svg>
+        <svg id="punchesB" width="800px" height="50px"></svg>
+        <svg id="punchesC" width="800px" height="50px"></svg>
+      </div>
+    </div>
+    <div class="description">
+      <h3>Description</h3>
+      <div class="content">Click next to begin</div>
+      <button onclick="previousStep()"><< Previous Step</button><button onclick="nextStep()">Next Step >></button>
+    </div>
   </div>
 
   <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -77,40 +90,89 @@
       end: 13,
     }];
 
+    const STEPS = [{
+      description: 'These are punches',
+      punches: [11, 12, 21, 13, 14, 22, 23, 15, 24, 25, 40, 32, 33, 21],
+    }, {
+      description: 'Run this thing',
+      punches: [],
+      punchesA: [11, 12, 21, 13, 14, 22, 23, 15, 24, 25, 40, 32, 33, 21],
+      punchesB: [11, 12, 21, 13, 14, 22, 23, 15, 24, 25, 40, 32, 33, 21],
+      punchesC: [11, 12, 21, 13, 14, 22, 23, 15, 24, 25, 40, 32, 33, 21],
+    }];
+
     const CONTROL_SIZE = 36;
     const PADDING = 25
 
 
-    d3.select('#sections')
-      .selectAll('line')
-        .data(sections)
-      .enter().append('line')
-        .attr('stroke', d => d.color)
-        .attr('stroke-width', CONTROL_SIZE)
-        .attr('stroke-linecap', 'round')
-        .attr('x1', d => d.start * CONTROL_SIZE + PADDING)
-        .attr('x2', d => (d.end) * CONTROL_SIZE + PADDING)
-        .attr('y1', PADDING)
-        .attr('y2', PADDING)
+    drawSectionLines('#sections', sections);
+    drawControls('#sections', controls);
 
-    const controlNode = d3.select('#sections')
-      .selectAll('g')
-        .data(controls)
-      .enter().append('g')
-        .attr('transform', (_, i) => `translate(${ i * CONTROL_SIZE },${ PADDING })`);
+    let step = 0;
+    run(step);
 
-      controlNode.append('circle')
-        .attr('stroke', 'black')
-        .attr('stroke-width', '1')
-        .attr('fill', 'transparent')
-        .attr('cx', PADDING)
-        .attr('cy', 0)
-        .attr('r', (CONTROL_SIZE - 6) / 2)
+    function run(step) {
+      const currentStep = STEPS[step];
+      displayDescription('.description .content', currentStep.description);
+      drawControls('#punches', currentStep.punches);
+      drawControls('#punchesA', currentStep.punchesA);
+      drawControls('#punchesB', currentStep.punchesB);
+      drawControls('#punchesC', currentStep.punchesC);
+    }
 
-      controlNode.append('text')
-        .attr('dx', 18)
-        .attr('dy', 5)
-        .text(d => d)
+    function previousStep() {
+      if (step <= 0) return;
+      step--;
+      run(step);
+    }
+
+    function nextStep() {
+      if (step >= STEPS.length - 1) return;
+      step++;
+      run(step);
+    }
+
+    function drawSectionLines(graph, sectionLines) {
+      d3.select(graph)
+        .selectAll('line')
+          .data(sectionLines)
+        .enter().append('line')
+          .attr('stroke', d => d.color)
+          .attr('stroke-width', CONTROL_SIZE)
+          .attr('stroke-linecap', 'round')
+          .attr('x1', d => d.start * CONTROL_SIZE + PADDING)
+          .attr('x2', d => (d.end) * CONTROL_SIZE + PADDING)
+          .attr('y1', PADDING)
+          .attr('y2', PADDING)
+    }
+
+    function drawControls(graph, controls) {
+      const controlNode = d3.select(graph)
+        .selectAll('g')
+          .data(controls)
+        .enter().append('g')
+          .attr('transform', (_, i) => `translate(${ i * CONTROL_SIZE },${ PADDING })`);
+
+        controlNode.append('circle')
+          .attr('stroke', 'black')
+          .attr('stroke-width', '1')
+          .attr('fill', 'transparent')
+          .attr('cx', PADDING)
+          .attr('cy', 0)
+          .attr('r', (CONTROL_SIZE - 6) / 2);
+
+        controlNode.append('text')
+          .attr('dx', 18)
+          .attr('dy', 5)
+          .text(d => d);
+
+        controlNode.exit().remove();
+    }
+
+    function displayDescription(elem, description) {
+      d3.select(elem)
+        .text(d => description);
+    }
 
   </script>
 
