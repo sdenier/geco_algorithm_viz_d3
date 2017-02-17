@@ -48,6 +48,74 @@
   </style>
 </head>
 <body>
+
+  <div class="algo">
+    <div>
+      <h2>Sections</h2>
+      <svg id="sections" width="800px" height="50px" style="border: 1px solid gray"></svg>
+    </div>
+    <div class="description"></div>
+  </div>
+
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script>
+    const controls = [11, 12, 13, 14, 15, 21, 22, 23, 24, 25, 31, 32, 33, 21];
+    const sections = [{
+      name: 'sectionA',
+      color: 'lightblue',
+      start: 0,
+      end: 4,
+    }, {
+      name: 'sectionB',
+      color: 'lightpink',
+      start: 5,
+      end: 9,
+    }, {
+      name: 'sectionC',
+      color: 'lightgreen',
+      start: 10,
+      end: 13,
+    }];
+
+    const CONTROL_SIZE = 36;
+    const PADDING = 25
+
+
+    d3.select('#sections')
+      .selectAll('line')
+        .data(sections)
+      .enter().append('line')
+        .attr('stroke', d => d.color)
+        .attr('stroke-width', CONTROL_SIZE)
+        .attr('stroke-linecap', 'round')
+        .attr('x1', d => d.start * CONTROL_SIZE + PADDING)
+        .attr('x2', d => (d.end) * CONTROL_SIZE + PADDING)
+        .attr('y1', PADDING)
+        .attr('y2', PADDING)
+
+    const controlNode = d3.select('#sections')
+      .selectAll('g')
+        .data(controls)
+      .enter().append('g')
+        .attr('transform', (_, i) => `translate(${ i * CONTROL_SIZE },${ PADDING })`);
+
+      controlNode.append('circle')
+        .attr('stroke', 'black')
+        .attr('stroke-width', '1')
+        .attr('fill', 'transparent')
+        .attr('cx', PADDING)
+        .attr('cy', 0)
+        .attr('r', (CONTROL_SIZE - 6) / 2)
+
+      controlNode.append('text')
+        .attr('dx', 18)
+        .attr('dy', 5)
+        .text(d => d)
+
+  </script>
+
+  <hr />
+
   <div>
     <div>
       <h2>Problem Exposition and Solution Overview/Rationale</h2>
@@ -601,85 +669,5 @@
     </div>
 
   </div>
-
-  <div class="chart">
-    <div class="controls row"></div>
-    <div class="sections row"></div>
-  </div>
-
-  <svg id="algo" width="800px" height="400px">
-  </svg>
-
-  <script src="https://d3js.org/d3.v4.min.js"></script>
-  <script>
-    const controls = [11, 12, 13, 14, 15, 21, 22, 23, 24, 25, 31, 32, 33, 21];
-    const sections = [{
-      name: 'sectionA',
-      color: 'lightblue',
-      start: 0,
-      end: 4,
-    }, {
-      name: 'sectionB',
-      color: 'lightpink',
-      start: 5,
-      end: 9,
-    }, {
-      name: 'sectionC',
-      color: 'lightgreen',
-      start: 10,
-      end: 13,
-    }];
-
-
-    const controlNodes = d3.select('.chart .controls')
-      .selectAll('div')
-        .data(controls)
-      .enter().append('div')
-        .attr('class', 'control')
-        // .style("width", function(d) { return d * 10 + "px"; })
-        .text(d => d);
-
-    const sectionNodes = d3.select('.chart .sections')
-      .selectAll('div')
-        .data(sections)
-      .enter().append('div')
-        .attr('class', 'section')
-        .attr('class', d => 'section ' + d.name)
-        .style('width', d => (d.end - d.start + 1) * 34 + 'px')
-        .style('height', '34px')
-
-    d3.select('#algo')
-      .selectAll('line')
-        .data(sections)
-      .enter().append('line')
-        .attr('stroke', d => d.color)
-        .attr('stroke-width', '36')
-        .attr('stroke-linecap', 'round')
-        .attr('x1', d => d.start * 36 + 20)
-        .attr('x2', d => (d.end) * 36 + 20)
-        .attr('y1', 50)
-        .attr('y2', 50)
-
-    const controlNode = d3.select('#algo')
-      .selectAll('g')
-        .data(controls)
-      .enter().append('g')
-        .attr('transform', (_, i) => `translate(${i * 36},50)`);
-
-      controlNode.append('circle')
-        .attr('stroke', 'black')
-        .attr('stroke-width', '1')
-        .attr('fill', (d, i) => i % 3 === 0 ? 'white' : i % 5 === 0 ? 'salmon' : 'transparent')
-        .attr('cx', 20)
-        .attr('cy', 0)
-        .attr('r', 15)
-
-      controlNode.append('text')
-        .attr('dx', 13)
-        .attr('dy', 5)
-        .text(d => d)
-
-
-  </script>
 </body>
 </html>
